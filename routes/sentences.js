@@ -5,7 +5,6 @@ var router = express.Router();
 var pool  = mysql.createPool({
   connectionLimit : 10,
   host            : process.env.OPENSHIFT_MYSQL_DB_HOST || 'localhost',
-  port            : process.env.OPENSHIFT_MYSQL_DB_PORT || 3306,
   user            : 'emachine',
   password        : 'emachine',
   database        : 'emachine'
@@ -19,6 +18,7 @@ router.get('/', function(req, res) {
   if (!sentenceHas) res.send({});
 
   pool.getConnection(function(err, connection) {
+    if (err) throw err;
     connection.query('SELECT id, sentence FROM sentences WHERE sentence like ? LIMIT 10', '%' + sentenceHas + '%', function(err, rows) {
       if (err) {
         connection.release();
