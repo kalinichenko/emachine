@@ -4,7 +4,8 @@ var router = express.Router();
 
 var pool  = mysql.createPool({
   connectionLimit : 10,
-  host            : 'localhost',
+  host            : process.env.OPENSHIFT_MYSQL_DB_HOST || 'localhost',
+  port            : process.env.OPENSHIFT_MYSQL_DB_PORT || 3306,
   user            : 'emachine',
   password        : 'emachine',
   database        : 'emachine'
