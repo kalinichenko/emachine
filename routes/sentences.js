@@ -19,7 +19,7 @@ router.get('/', function(req, res) {
 
   pool.getConnection(function(err, connection) {
     if (err) throw err;
-    connection.query('SELECT id, sentence FROM sentences WHERE sentence like ? LIMIT 10', '%' + sentenceHas + '%', function(err, rows) {
+    connection.query('SELECT id, sentence_eng, sentence_rus FROM sentences WHERE sentence_eng like ? LIMIT 10', '%' + sentenceHas + '%', function(err, rows) {
       if (err) {
         connection.release();
         throw err;

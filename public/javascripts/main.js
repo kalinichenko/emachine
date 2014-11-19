@@ -1,15 +1,25 @@
 var playList;
 
-var idx = 0;
-var interval = 2000;
-var howls;
-var isInterval = false;
+var howls,
+    repeat = 0,
+    idx = 0,
+    isInterval = false,
+    minInterval = 3000;
 
 
 function playNext() {
   isInterval = true;
+  console.log(howls[idx]._duration);
+  var interval = howls[idx]._duration * 1.5 * 1000;
+  console.log(interval);
+
   setTimeout(function() {
-    idx++;
+    if (repeat >= 2) {
+      idx++;
+      repeat = 0;
+    } else {
+      repeat++;
+    }
     if (idx == playList.length) {
       idx = 0;
     }
@@ -17,12 +27,13 @@ function playNext() {
       play();
       isInterval = false;
     }
-  }, interval);
+  }, interval < minInterval ? interval : minInterval);
 }
 
 
 function play() {
-  document.getElementById('sentence').innerHTML = playList[idx].sentence;
+  document.getElementById('sentence_eng').innerHTML = playList[idx].sentence_eng;
+  document.getElementById('sentence_rus').innerHTML = playList[idx].sentence_rus;
   howls[idx].play();
 }
 
@@ -61,14 +72,23 @@ function onSearch() {
 
   request.onload = function() {
 
+    var tbody = document.getElementById('play-list').children[0];
+    while (tbody.firstChild) {
+      tbody.removeChild(tbody.firstChild);
+    }
+
     playList = request.response;
 
     for (var i = 0; i < playList.length; i++) {
       howls.push(new Howl({
-        //
         urls: ['audio/' + playList[i].id + '.mp3'],
         onend: playNext
       }));
+      var tr=document.createElement('tr');
+      var td = document.createElement('td');
+      td.appendChild(document.createTextNode(playList[i].sentence_eng));
+      tr.appendChild(td);
+      tbody.appendChild(tr);
     }
   };
 
