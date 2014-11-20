@@ -153,6 +153,14 @@ function onHidePlayList() {
   }
 }
 
+function onKeyPress(e) {
+  if (e.keyCode == 13) {
+    var tb = document.getElementById("keyword");
+    onSearch();
+    return false;
+  }
+}
+
 window.onload = function() {
   $playCtrlBtn = document.getElementById('play-ctrl-btn');
   $playCtrlBtn.addEventListener('click', onPlay);
