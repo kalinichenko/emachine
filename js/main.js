@@ -82,6 +82,10 @@ function onPause() {
   $playCtrlBtn.addEventListener('click', onPlay);
 }
 
+function startPause() {
+  $playCtrlBtn.className === 'play-button' ? onPlay() : onPause();
+}
+
 function onSearch() {
   howls = [];
   var keyword = document.getElementById('keyword').value;
@@ -114,6 +118,7 @@ function onSearch() {
 
       var td0 = document.createElement('td');
       td0.appendChild(document.createTextNode(request.response[i].sentence_eng));
+      td0.addEventListener('click', startPause);
       tr.appendChild(td0);
 
       var td1 = document.createElement('td');
@@ -173,7 +178,10 @@ window.onload = function() {
 
   $playListPanel = document.getElementById('play-list-panel');
 
+
   $sentencePanel = document.getElementById('sentence-panel');
+  $sentencePanel.addEventListener('click', startPause);
+
   $sentenceEng = document.getElementById('sentence-eng');
   $sentenceRus = document.getElementById('sentence-rus');
 }
