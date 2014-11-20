@@ -1,14 +1,18 @@
 extends layout
 
 block content
-  form.pure-form
-    fieldset
-      input#keyword(type="text")
-      button#search-button.pure-button.pure-button-primary(type="button") Search
+  div.player
+    div#play-list-panel
+      button#search-btn(type="button") Search
+      span#keyword-panel
+        input#keyword(type="text", placeholder="enter the keyword")
+      table#play-list-table
+        tbody
 
-  h1#sentence_eng
-  p#sentence_rus
-  button#ctrl-button.pure-button(type="button") Play
+    div#ctrl-panel
+      button#play-ctrl-btn.play-button(type="button")
+      button#play-list-btn(type="button")
+    div#sentence-panel
+      h1#sentence-eng
+      p#sentence-rus
 
-  table#play-list.pure-table
-    tbody

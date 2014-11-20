@@ -6,12 +6,18 @@ var howls,
     isInterval = false,
     minInterval = 3000;
 
+var $playCtrlBtn,
+    $playListBtn,
+    $searchBtn,
+    $playListPanel,
+    $sentenceEng,
+    $sentenceRus;
+
+
 
 function playNext() {
   isInterval = true;
-  console.log(howls[idx]._duration);
-  var interval = howls[idx]._duration * 1.5 * 1000;
-  console.log(interval);
+  var interval = howls[idx]._duration * 1.25 * 1000;
 
   setTimeout(function() {
     if (repeat >= 2) {
@@ -20,20 +26,20 @@ function playNext() {
     } else {
       repeat++;
     }
-    if (idx == playList.length) {
+    if (idx == howls.length) {
       idx = 0;
     }
     if (isInterval) {
       play();
       isInterval = false;
     }
-  }, interval < minInterval ? interval : minInterval);
+  }, interval > minInterval ? interval : minInterval);
 }
 
 
 function play() {
-  document.getElementById('sentence_eng').innerHTML = playList[idx].sentence_eng;
-  document.getElementById('sentence_rus').innerHTML = playList[idx].sentence_rus;
+  $sentenceEng.innerHTML = howls[idx].sentenceEng;
+  $sentenceRus.innerHTML = howls[idx].sentenceRus;
   howls[idx].play();
 }
 
@@ -45,18 +51,35 @@ function pause() {
   }
 }
 
+function onDelete(event) {
+  event.target.removeEventListener('click');
+  var tr = event.target.parentNode.parentNode;
+  for (var i = 0; i < howls.length; i++) {
+    if (howls[i].id == tr.id) {
+      howls.splice(i, 1);
+      tr.remove();
+      return;
+    }
+  }
+}
+
 function onPlay() {
   play();
-  event.target.removeEventListener('click', onPlay);
-  event.target.innerHTML = 'Pause';
-  event.target.addEventListener('click', onPause);
+  $playCtrlBtn.removeEventListener('click', onPlay);
+  $playCtrlBtn.className = 'pause-button';
+  $playCtrlBtn.addEventListener('click', onPause);
+
+  $playListPanel.style.display = 'none';
+  $playListBtn.style.display='inline-block';
+
+  $sentencePanel.style.display='block';
 }
 
 function onPause() {
   pause();
-  event.target.removeEventListener('click', onPause);
-  event.target.innerHTML = 'Play';
-  event.target.addEventListener('click', onPlay);
+  $playCtrlBtn.removeEventListener('click', onPause);
+  $playCtrlBtn.className = 'play-button';
+  $playCtrlBtn.addEventListener('click', onPlay);
 }
 
 function onSearch() {
@@ -72,23 +95,42 @@ function onSearch() {
 
   request.onload = function() {
 
-    var tbody = document.getElementById('play-list').children[0];
+    var tbody = document.getElementById('play-list-table').children[0];
     while (tbody.firstChild) {
       tbody.removeChild(tbody.firstChild);
     }
 
-    playList = request.response;
-
-    for (var i = 0; i < playList.length; i++) {
-      howls.push(new Howl({
-        urls: ['audio/' + playList[i].id + '.mp3'],
-        onend: playNext
-      }));
+    for (var i = 0; i < request.response.length; i++) {
+      var howl = new Howl({
+        urls: ['audio/' + request.response[i].id + '.mp3'],
+        onend: playNext,
+      });
+      howl.id = request.response[i].id;
+      howl.sentenceRus = request.response[i].sentence_rus;
+      howl.sentenceEng = request.response[i].sentence_eng;
+      howls.push(howl);
       var tr=document.createElement('tr');
-      var td = document.createElement('td');
-      td.appendChild(document.createTextNode(playList[i].sentence_eng));
-      tr.appendChild(td);
+      tr.id = request.response[i].id;
+
+      var td0 = document.createElement('td');
+      td0.appendChild(document.createTextNode(request.response[i].sentence_eng));
+      tr.appendChild(td0);
+
+      var td1 = document.createElement('td');
+      tr.appendChild(td1);
+
+      var a = document.createElement('a');
+      a.className = 'delete-item';
+      a.addEventListener('click', onDelete);
+
+      td1.appendChild(a)
+
       tbody.appendChild(tr);
+    }
+    if (request.response.length > 0) {
+      $playCtrlBtn.style.display='inline-block';
+    } else {
+      $playCtrlBtn.style.display='none';
     }
   };
 
@@ -99,8 +141,31 @@ function onSearch() {
   request.send();
 }
 
+function onHidePlayList() {
+  var $playListPanel = document.getElementById('play-list-panel');
+  if (window.getComputedStyle($playListPanel).display === 'none') {
+    $playListPanel.style.display = 'block';
+    $playListBtn.style.display='none';
+    onPause();
+    $sentencePanel.style.display='none';
+  } else {
+    $playListPanel.style.display = 'none';
+  }
+}
 
 window.onload = function() {
-  document.getElementById('ctrl-button').addEventListener('click', onPlay);
-  document.getElementById('search-button').addEventListener('click', onSearch);
+  $playCtrlBtn = document.getElementById('play-ctrl-btn');
+  $playCtrlBtn.addEventListener('click', onPlay);
+
+  $playListBtn = document.getElementById('play-list-btn');
+  $playListBtn.addEventListener('click', onHidePlayList);
+
+  $searchBtn = document.getElementById('search-btn');
+  $searchBtn.addEventListener('click', onSearch);
+
+  $playListPanel = document.getElementById('play-list-panel');
+
+  $sentencePanel = document.getElementById('sentence-panel');
+  $sentenceEng = document.getElementById('sentence-eng');
+  $sentenceRus = document.getElementById('sentence-rus');
 }
