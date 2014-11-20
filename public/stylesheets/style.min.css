@@ -1,9 +1,11 @@
 html{font-family:sans-serif}
-body{margin:10px}
+.player,body,html{margin:0;height:100%}
 input{padding:.5em .6em;display:inline-block;border:1px solid #ccc;border-radius:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
 button{font-family:inherit;padding:.5em 1em;color:#444;color:rgba(0,0,0,.8);border:1px solid #ccc;background-color:transparent;text-decoration:none;border-radius:0}
 button,input,select,textarea{font-size:100%;margin:0;vertical-align:baseline}
 @media only screen and (min-width:480px){.player{width:480px;margin:0 auto}}
+@media only screen and (max-width:480px){.license-info{display:none}}
+.player{padding-top:10px;height:auto;min-height:100%}
 .delete-item{background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAzUlEQVQ4T9WTsQ4BURBFd3USld6nINHhL/SiVqloJUSh82fUah+wZ+QlHubNTLEFm9xq7juZmTtbVy1/dcu86v+AHVawQvvAKrp4FuiUe7WRhxhmaG1ABXZAW3TzgFK3oEWYPLRC0aAmzANKfYSmaXyBHdOY19I6Imcz5vEc9T1YpEPxSGcXdEdLI6hnyesw39kAv5e+CdQCcE+q1KGVpgnVgJE08/Tf1voJlF/vjHaoeBqJIOlP0CYnah32MDy8NFP9y+ulHOS+bL8PbAD06SIVQ2Y9cAAAAABJRU5ErkJggg==) no-repeat center;width:20px;display:block;height:20px;cursor:pointer}
 #play-list-panel{display:table;width:100%}
 #play-list-table{margin:10px 0;width:100%}
@@ -18,3 +20,4 @@ td{padding:.5em 0}
 #sentence-panel{text-align:center}
 #sentence-eng{font-size:3em}
 #sentence-rus{color:gray;font-style:italic;padding-top:30px}
+.license-info{font-size:.7em;clear:both;position:relative;z-index:10;margin-top:-4em;background-color:#fff}
