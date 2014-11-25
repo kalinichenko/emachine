@@ -32,3 +32,5 @@ gulp.task('watch:js', function () {
 
 gulp.task('watch', ['watch:css', 'watch:js']);
 
+gulp.task('default', ['watch']);
+

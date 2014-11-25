@@ -5,11 +5,9 @@ var db = require('./db');
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-  var sentenceHas = req.query.like;
   res.type('application/json');
-  if (!sentenceHas) res.send({});
 
-  db.filter(sentenceHas, function(err, result) {
+  db.random(function(err, result) {
     if(err) {
       res.status(500).send("Server Error");
       return;

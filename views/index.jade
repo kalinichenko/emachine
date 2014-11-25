@@ -3,6 +3,7 @@ extends layout
 block content
   div.player
     div#play-list-panel
+      button#random-btn(type="button") Random
       button#search-btn(type="button") Search
       span#keyword-panel
         input#keyword(type="text", placeholder="enter the keyword", onkeypress="return onKeyPress(event)")

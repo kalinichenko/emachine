@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var audio = require('./routes/audio');
 var sentences = require('./routes/sentences');
+var random = require('./routes/random');
 
 var app = express();
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/audio', audio);
 app.use('/sentences', sentences);
+app.use('/random', random);
 
 
 // catch 404 and forward to error handler

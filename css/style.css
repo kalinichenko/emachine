@@ -82,10 +82,11 @@ td {
   width: 100%
 }
 
-#search-btn {
+#search-btn, #random-btn {
   float: right;
   border-left: 0;
 }
+
 
 #keyword-panel {
   display: block;

@@ -86,13 +86,19 @@ function startPause() {
   $playCtrlBtn.className === 'play-button' ? onPlay() : onPause();
 }
 
+function onRandom() {
+  load('random');
+}
+
 function onSearch() {
-  howls = [];
   var keyword = document.getElementById('keyword').value;
   if(!keyword) return;
 
-  var url = 'sentences?like=' + keyword;
+  load('sentences?like=' + keyword);
+}
 
+function load(url) {
+  howls = [];
   var request = new XMLHttpRequest();
   request.open("GET", url, true);
   request.responseType = "json";
@@ -175,6 +181,9 @@ window.onload = function() {
 
   $searchBtn = document.getElementById('search-btn');
   $searchBtn.addEventListener('click', onSearch);
+
+  $randomBtn = document.getElementById('random-btn');
+  $randomBtn.addEventListener('click', onRandom);
 
   $playListPanel = document.getElementById('play-list-panel');
 
