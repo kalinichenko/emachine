@@ -6,7 +6,7 @@ block content
       button#random-btn(type="button") Random
       button#search-btn(type="button") Search
       span#keyword-panel
-        input#keyword(type="text", placeholder="enter the keyword", onkeypress="return onKeyPress(event)")
+        input#keyword(type="text", placeholder="enter the keyword", onkeypress="return onKeyPress(event)", onclick="this.select()")
       table#play-list-table
         tbody
 
