@@ -6,18 +6,43 @@
     "start": "node server.js"
   },
   "main": "server.js",
+  "browser": {
+    "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "bootstrap": {
+      "exports": "bootstrap",
+      "depends": [
+        "jquery:$"
+      ]
+    }
+  },
   "dependencies": {
+    "backbone.babysitter": "^0.1.5",
+    "backbone.localstorage": "^1.1.14",
+    "backbone.wreqr": "^1.3.1",
     "body-parser": "~1.8.1",
+    "bootstrap": "^3.3.1",
+    "compression": "^1.2.2",
     "cookie-parser": "~1.3.3",
     "debug": "~2.0.0",
     "express": "~4.9.0",
+    "howler": "^1.1.25",
     "jade": "~1.6.0",
     "morgan": "~1.3.0",
     "mysql": "^2.5.3",
-    "serve-favicon": "~2.1.3"
+    "serve-favicon": "~2.1.3",
+    "underscore": "^1.7.0",
+    "jquery": "^2.1.1"
   },
   "devDependencies": {
     "gulp": "^3.8.10",
+    "gulp-gzip": "0.0.8",
     "gulp-minify-css": "^0.3.11"
   }
 }

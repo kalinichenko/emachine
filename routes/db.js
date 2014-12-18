@@ -13,12 +13,13 @@ var pool  = mysql.createPool({
 });
 
 module.exports = {
-  random: function(callback) {
-    this._get('SELECT id, sentence_eng, sentence_rus FROM sentences order by RAND() limit ?', [pageSize], callback);
-  },
-  filter: function(likeCondition, callback) {
-    this._get('SELECT id, sentence_eng, sentence_rus FROM sentences WHERE sentence_eng like ? LIMIT ?',
-        ['%' + likeCondition + '%', pageSize], callback);
+  filter: function(callback, likeCondition) {
+    if (likeCondition) {
+      this._get('SELECT id, sentence_eng, sentence_rus FROM sentences WHERE sentence_eng like ? LIMIT ?',
+          ['%' + likeCondition + '%', pageSize], callback);
+    } else {
+      this._get('SELECT id, sentence_eng, sentence_rus FROM sentences order by RAND() limit ?', [pageSize], callback);
+    }
   },
   get: function(page, callback) {
     this._get('SELECT id, sentence_eng, sentence_rus FROM sentences LIMIT ?,?', [pageSize * page, pageSize], callback);

@@ -1,0 +1,78 @@
+script(type='text/template' id='menu-template')
+  nav.navbar.navbar-default(role="navigation")
+    div.navbar-header
+      button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1")
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+      a.navbar-brand(href="#") E-machine
+    div.collapse.navbar-collapse#bs-example-navbar-collapse-1
+      ul.nav.navbar-nav
+        li
+          a.favorites(href="#") Favorites
+      ul.nav.navbar-nav
+        li
+          a.search(href="#") Search
+      ul.nav.navbar-nav
+        li
+          a.player(href="#") Player
+
+script(type='text/template' id='main-layout-template')
+  header#menu
+  div.container-fluid
+    article#content
+
+script(type='text/template' id='favorite-template')
+    td.play.hidden-xs.cursor-pointer
+      a(href='')
+        i.glyphicon.glyphicon-play
+    td.favorite.play.cursor-pointer <%= sentence_eng %>
+    td.hidden-xs
+      a.del(href='')
+        i.glyphicon.glyphicon-remove
+    td
+      button.del.btn.btn-default.hidden(type='button') Delete
+
+script(type='text/template' id='favorites-template')
+    table.table.table-hover.borderless
+        tbody
+
+script(type='text/template' id='favorites-empty-template')
+    p(style='white-space:pre;')
+        | Your learning list is empty.
+        | Wanna to add something interesting?
+    input#add(type='button' value='OK')
+
+
+script(type='text/template' id='sentence-template')
+    td <%= sentence_eng %>
+    td
+      button.sentence-add.btn.btn-default(type='button') Add
+
+script(type='text/template' id='sentence-list-template')
+    table.table.borderless
+        tbody
+
+script(type='text/template' id='sentences-empty-template')
+    p(style='white-space:pre;')
+        | Nothing found by specified criteria.
+
+script(type='text/template' id='filter-template')
+  form(role="form")
+    div.form-group
+      div.input-group
+        input.sentences_filter-criteria.form-control(type='text' autofocus)
+        span.input-group-btn
+          button.sentences_filter-find.btn.btn-primary(type='button') Find
+
+script(type='text/template' id='finder-layout-view-template')
+    div.finder-filter
+    div.finder-content
+
+script(type='text/template' id='player-template')
+  h1.text-center <%= sentence_eng %>
+  h4.text-center
+    small <%= sentence_rus %>
+  button.play-pause.btn.btn-default.form-control <% if (status === 'playing') { %>  Pause <% } else { %> Play <% } %>
+

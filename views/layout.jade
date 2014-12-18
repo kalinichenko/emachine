@@ -7,8 +7,15 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1')
 
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.min.css')
-    script(src='/javascripts/main.min.js')
-    script(src='https://cdn.rawgit.com/goldfire/howler.js/master/howler.min.js')
+    script(src='/javascripts/vendor.js')
+    script(src='/javascripts/main.js')
+
+
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css")
+    link(rel="stylesheet" href="stylesheets/style.css")
+
+    include ./templates.jade
+
+
   body
     block content

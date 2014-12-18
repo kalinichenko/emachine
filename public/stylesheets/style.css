@@ -1,0 +1,17 @@
+.borderless tbody tr td, .borderless thead tr th {
+    border: none;
+}
+
+tr:not(:hover) .glyphicon {
+  color: lightgrey;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.bottom-of-page {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
