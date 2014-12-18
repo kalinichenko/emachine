@@ -17,25 +17,8 @@ var FavoriteItemView = Marionette.ItemView.extend({
   tagName: 'tr',
   template: _.template($('#favorite-template').html()),
   triggers: {
-    'click @ui.del': 'favorite:del',
+    'click .del': 'favorite:del',
     'click .play': 'favorite:play'
-  },
-  ui: {
-    '$del': '.del'
-  },
-  events: {
-    'swipe': 'swipeMe',
-    'swipeleft': 'showDel',
-    'swiperight': 'hideDel'
-  },
-  swipeMe: function(e) {
-    alert('swiped ' + e.direction);
-  },
-  showDel: function() {
-    this.ui.$del.show();
-  },
-  hideDel: function() {
-    this.ui.$del.hide();
   }
 });
 
@@ -49,7 +32,7 @@ var FavoriteListView = Marionette.CompositeView.extend({
 var FavoritesEmptyView = Marionette.ItemView.extend({
   template: _.template($('#favorites-empty-template').html()),
   triggers: {
-    'click #add': 'search:show'
+    'click .add': 'search:show'
   }
 });
 

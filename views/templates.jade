@@ -31,18 +31,18 @@ script(type='text/template' id='favorite-template')
     td.hidden-xs
       a.del(href='')
         i.glyphicon.glyphicon-remove
-    td
-      button.del.btn.btn-default.hidden(type='button') Delete
+    td.visible-xs
+      button.del.btn.btn-default(type='button') Delete
 
 script(type='text/template' id='favorites-template')
     table.table.table-hover.borderless
         tbody
 
 script(type='text/template' id='favorites-empty-template')
-    p(style='white-space:pre;')
+    h3(style='white-space:pre;')
         | Your learning list is empty.
         | Wanna to add something interesting?
-    input#add(type='button' value='OK')
+    button.add.btn.btn-primary(type='button') Add
 
 
 script(type='text/template' id='sentence-template')
