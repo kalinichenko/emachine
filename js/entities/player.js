@@ -7,41 +7,45 @@ var repeat = 0,
   _audio,
   _next;
 
-var _viewModel = new Backbone.Model();
+
+var ViewModel = Backbone.Model.extend({
+  defaults: {
+    'action': 'Pause',
+    'sentence_eng': '',
+    'sentence_rus': ''
+  }
+});
+
+var _viewModel = new ViewModel();
 
 function play() {
   _viewModel.set({
-    'status': 'playing'
+    'action': 'Pause',
   });
 
   _audio.howl.play();
-  console.log('play: ' + _viewModel.get('sentence_eng'));
 }
 
 function pause() {
   _viewModel.set({
-    'status': 'paused'
+    'action': 'Play',
   });
 
   if (_audio.timeoutId) {
-    console.log('paused: clearTimeout: ' + _audio.timeoutId);
     clearTimeout(_audio.timeoutId);
     delete _audio.timeoutId;
   } else {
     _audio.howl.pause();
-    console.log('audio.pause: ' + _viewModel.get('sentence_eng'));
   }
 
 }
 
 function _stop() {
   if (_audio.timeoutId) {
-    console.log('stop: clearTimeout' + _audio.timeoutId);
     clearTimeout(_audio.timeoutId);
     delete _audio.timeoutId;
   } else {
     _audio.howl.stop();
-    console.log('stop: audio.stop' + _viewModel.get('sentence_eng'));
   }
 }
 
@@ -52,22 +56,14 @@ function next() {
 }
 
 function onEnd() {
-  console.log('onend: start :' + _viewModel.get('sentence_eng'));
   var interval = _audio.howl._duration * 1.25 * 1000;
-  // console.log('onend: duration: ' + _audio.howl._duration);
-  // console.log('onend: interval: ' + interval);
 
   var timeoutId = setTimeout(function() {
-    console.log('onend: woken up:' + _viewModel.get('sentence_eng'));
     delete _audio.timeoutId;
-    console.log('onend: delete timeoutId: ' + timeoutId);
     if (repeat >= 2) {
       _audio = next();
       _next = next();
       _viewModel.set(_audio.attributes);
-      // _viewModel.set({
-      //   'audio': next
-      // });
       repeat = 0;
     } else {
       repeat++;
@@ -75,26 +71,29 @@ function onEnd() {
     play();
   }, interval > minInterval ? interval : minInterval);
 
-  console.log('onend: create timeoutId: ' + timeoutId);
   _audio.timeoutId = timeoutId;
-  // console.log('onend: finish');
 }
 
 function load(audio, onLoad) {
-  // console.log('load:' + audio.sentence_eng);
 
   audio.howl = new Howl({
-    urls: ['http://nodejs-emachine.rhcloud.com/' + 'audio/' + audio.id + '.mp3'],
-    // urls: ['audio/' + audio.id + '.mp3'],
-    // autoplay: true,
+    // urls: ['http://nodejs-emachine.rhcloud.com/' + 'audio/' + audio.id + '.mp3'],
+    urls: ['audio/' + audio.id + '.mp3'],
     onend: onEnd,
     onload: function() {
       onLoad && onLoad();
     },
+    onloaderror: function(error) {
+      _viewModel.set({
+        'error': true,
+        'type': error.type
+      });
+
+
+    },
     onplay: function() {
       // preload next audio
       _next.howl || load(_next);
-      console.log('preload: ' + _viewModel.get('sentence_eng'));
     }
   });
 }
@@ -104,7 +103,7 @@ module.exports = {
   remove: function(audio) {
 
   },
-  play: function(audio, onLoad) {
+  play: function(audio, onLoading, onLoaded) {
     if (!audio) {
       play();
     } else {
@@ -115,9 +114,9 @@ module.exports = {
       _next = next();
       _viewModel.set(_audio.attributes);
       if (!_audio.howl) {
+        onLoading && onLoading();
         load(audio, function() {
-          onLoad && onLoad();
-          console.log('onload: ' + _viewModel.get('sentence_eng'));
+          onLoaded && onLoaded();
           play();
         });
       } else {

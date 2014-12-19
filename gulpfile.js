@@ -9,7 +9,7 @@ var gulp = require('gulp'),
   browserify = require('browserify'),
   source = require('vinyl-source-stream'),
   buffer = require('vinyl-buffer'),
-  vendors = ['jquery', 'backbone', 'underscore', 'backbone.marionette', 'howler', 'bootstrap'],
+  vendors = ['jquery', 'backbone', 'underscore', 'backbone.marionette', 'backbone.localstorage', 'howler', 'bootstrap', 'rivets'],
   gzip = require('gulp-gzip');
 
 

@@ -34,11 +34,12 @@
     "express": "~4.9.0",
     "howler": "^1.1.25",
     "jade": "~1.6.0",
+    "jquery": "^2.1.1",
     "morgan": "~1.3.0",
     "mysql": "^2.5.3",
+    "rivets": "^0.7.1",
     "serve-favicon": "~2.1.3",
-    "underscore": "^1.7.0",
-    "jquery": "^2.1.1"
+    "underscore": "^1.7.0"
   },
   "devDependencies": {
     "gulp": "^3.8.10",

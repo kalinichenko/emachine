@@ -5,17 +5,10 @@ var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
+var rivets = require('rivets');
 
 var favorites = require('../entities/favorites');
-var sentences = require('../entities/sentences');
-
-
-var HeaderView = Marionette.ItemView.extend({
-  template: '#search-header-template',
-  triggers: {
-    'click a.favorites': 'favorite:list'
-  }
-});
+var searchService = require('../entities/search');
 
 
 var SearchRouter = Marionette.AppRouter.extend({
@@ -38,19 +31,31 @@ var FilterView = Marionette.ItemView.extend({
   className: 'sentences-filter',
   template: _.template($('#filter-template').html()),
   ui: {
-    'criteria': '.sentences_filter-criteria'
+    'findButton': '.sentences_filter-find'
   },
   events: {
     'click .sentences_filter-find': 'onFind',
     'keyup .sentences_filter-criteria': 'onEnter'
   },
+  loaded: function() {
+    this.ui.findButton.button('reset');
+  },
   onFind: function() {
-    this.trigger('sentences:find', this.ui.criteria.val());
+    this.ui.findButton.button('loading');
+    this.trigger('sentences:find');
   },
   onEnter: function(event) {
     if (event.keyCode === 13) {
       this.onFind();
     }
+  },
+  onShow: function() {
+    this.binding = rivets.bind(this.$el, {
+      model: this.model
+    });
+  },
+  onDestroy: function() {
+    this.binding.unbind();
   }
 });
 
@@ -62,7 +67,20 @@ var SentenceView = Marionette.ItemView.extend({
   }
 });
 
+var SentencesEmptyView = Marionette.ItemView.extend({
+  template: _.template($('#sentences-empty-template').html())
+});
+
+var ErrorView = Marionette.ItemView.extend({
+  template: _.template($('#sentences-error-template').html()),
+  serializeData: function() {
+    return this.model;
+  }
+});
+
+
 var SentenceListView = Marionette.CompositeView.extend({
+  emptyView: SentencesEmptyView,
   childView: SentenceView,
   childViewContainer: 'tbody',
   collectionEvents: {
@@ -71,40 +89,52 @@ var SentenceListView = Marionette.CompositeView.extend({
   template: _.template($('#sentence-list-template').html())
 });
 
-var SentencesEmptyView = Marionette.ItemView.extend({
-  template: _.template($('#sentences-empty-template').html())
-});
 
 var API = {
   show: function() {
+
     App.commands.execute('menu:set-active', '.search');
     var searchLayoutView = new SearchLayoutView();
+    App.content.show(searchLayoutView);
 
-    var filterView = new FilterView();
-    filterView.on('sentences:find', function(criteria) {
-      sentences.list({
-        data: {
-          'like': criteria
-        },
-        success: function(sentences) {
-          var sentenceListView;
-          if (sentences.length > 0) {
-            sentenceListView = new SentenceListView({
+
+    // search filter
+    var filterView = new FilterView({
+      model: searchService.dataModel()
+    });
+    filterView.on('sentences:find', function() {
+      searchService.list({
+        success: function() {
+          filterView.loaded();
+          // search result
+          // if (!sentenceListView) {
+            var sentences = searchService.dataModel().get('sentences');
+            var resultView = new SentenceListView({
               collection: sentences
             });
-            sentenceListView.on('childview:sentence:add', function(childView) {
+            resultView.on('childview:sentence:add', function(childView) {
               favorites.add(childView.model.attributes);
               sentences.remove(childView.model);
             });
-          } else {
-            sentenceListView = new SentencesEmptyView();
-          }
-          searchLayoutView.list.show(sentenceListView);
+            searchLayoutView.list.show(resultView);
+          // }
+        },
+        error: function(collection, response, options) {
+          filterView.loaded();
+            var resultView = new ErrorView({
+              model: {
+                status: response.status,
+                statusText: response.statusText,
+              }
+            });
+            searchLayoutView.list.show(resultView);
         }
       });
+
     });
-    App.content.show(searchLayoutView);
     searchLayoutView.filter.show(filterView);
+
+
   }
 };
 
