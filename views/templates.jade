@@ -18,25 +18,19 @@ script(type='text/template' id='menu-template')
         li
           a.player(href="#") Player
 
-script(type='text/template' id='main-layout-template')
-  header#menu
-  div.container-fluid
-    article#content
 
-script(type='text/template' id='favorite-template')
-    td.play.hidden-xs.cursor-pointer
+script(type='text/template' id='favorite-layout-view-template')
+    div.favorite-list.visible-xs.row
+    table.table.table-hover.borderless.favorite-table.hidden-xs
+
+script(type='text/template' id='favorite-tr-template')
+    td.play.cursor-pointer
       a(href='')
         i.glyphicon.glyphicon-play
     td.favorite.play.cursor-pointer <%= sentence_eng %>
-    td.hidden-xs
+    td
       a.del(href='')
         i.glyphicon.glyphicon-remove
-    td.visible-xs
-      button.del.btn.btn-default.pull-right(type='button') Delete
-
-script(type='text/template' id='favorites-template')
-    table.table.table-hover.borderless
-        tbody
 
 script(type='text/template' id='favorites-empty-template')
     h3(style='white-space:pre;')

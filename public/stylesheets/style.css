@@ -1,17 +1,46 @@
 .borderless tbody tr td, .borderless thead tr th {
-    border: none;
+  border: none;
 }
-
 tr:not(:hover) .glyphicon {
   color: lightgrey;
 }
-
 .cursor-pointer {
   cursor: pointer;
 }
-
 .bottom-of-page {
   position: fixed;
   bottom: 0;
   width: 100%;
+}
+/* Disable Auto Zoom in Input “Text” tag - Safari on iPhone */
+
+select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"] {
+  font-size: 16px;
+}
+.swipe-out .delete-btn {
+  padding: 17px 25px;
+  background: #ff3b30;
+  color: #fff;
+  font: bold 14px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+  right: 0 !important;
+}
+
+.list-bordered li {
+  border-bottom: 1px solid #ddd !important;
+}
+
+.nav-stick {
+  margin-top: -20px;
+}
+
+.fixed-height {
+  line-height: 50px;
+  vertical-align: middle;
+  padding: 0 15px;
+}
+
+.clipping-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

@@ -4,6 +4,10 @@ window.$ = window.jQuery = require('jquery');
 require('bootstrap');
 var rivets = require('rivets');
 
+// it needs just to initialize ios audio system
+var Howl = require('howler').Howl;
+new Howl({});
+
 
 document.addEventListener('DOMContentLoaded', function() {
   var Backbone = require('backbone');

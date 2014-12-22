@@ -1,1 +1,732 @@
-!function e(t,n,o){function i(r,s){if(!n[r]){if(!t[r]){var c="function"==typeof require&&require;if(!s&&c)return c(r,!0);if(a)return a(r,!0);var l=new Error("Cannot find module '"+r+"'");throw l.code="MODULE_NOT_FOUND",l}var u=n[r]={exports:{}};t[r][0].call(u.exports,function(e){var n=t[r][1][e];return i(n?n:e)},u,u.exports,e,t,n,o)}return n[r].exports}for(var a="function"==typeof require&&require,r=0;r<o.length;r++)i(o[r]);return i}({1:[function(e){"use strict";window.$=window.jQuery=e("jquery"),e("bootstrap");var t=e("rivets");document.addEventListener("DOMContentLoaded",function(){var n=e("backbone"),o=e("./app");e("./apps/search"),e("./apps/favorites"),e("./apps/player"),e("./apps/menu"),t.adapters[":"]={observe:function(e,t,n){e.on("change:"+t,n)},unobserve:function(e,t,n){e.off("change:"+t,n)},get:function(e,t){return e.get(t)},set:function(e,t,n){e.set(t,n)}},o.start(),n.history.start()})},{"./app":2,"./apps/favorites":3,"./apps/menu":4,"./apps/player":5,"./apps/search":6,backbone:"backbone",bootstrap:"bootstrap",jquery:"jquery",rivets:"rivets"}],2:[function(e,t){"use strict";var n,o;o=n=e("jquery");var i=e("backbone");i.$=n;var a=e("backbone.marionette"),r=new a.Application({regions:{menu:"#menu",content:"#content"}});r.navigate=function(e,t){t||(t={}),i.history.navigate(e,t)},r.commands.execute("menu:show"),t.exports=r},{backbone:"backbone","backbone.marionette":"backbone.marionette",jquery:"jquery"}],3:[function(e){"use strict";var t=e("../app"),n=e("backbone.marionette"),o=e("underscore"),i=e("jquery"),a=e("../entities/favorites"),r=n.AppRouter.extend({appRoutes:{"":"list",favorites:"list"}}),s=n.ItemView.extend({tagName:"tr",template:o.template(i("#favorite-template").html()),triggers:{"click .del":"favorite:del","click .play":"favorite:play"}}),c=n.CompositeView.extend({className:"favorites",childView:s,childViewContainer:"tbody",template:o.template(i("#favorites-template").html())}),l=n.ItemView.extend({template:o.template(i("#favorites-empty-template").html()),triggers:{"click .add":"search:show"}}),u={list:function(){t.commands.execute("menu:set-active",".favorites"),a.list().then(function(e){var n;e.length>0?(n=new c({collection:e}),n.on("childview:favorite:del",function(e){a.del(e.model.id)}),n.on("childview:favorite:play",function(e){t.trigger("player:show",e.model.id)})):(n=new l,n.on("search:show",function(){t.trigger("search:show")})),t.content.show(n)})}};t.on("favorite:list",function(){t.navigate("favorites"),u.list()}),t.addInitializer(function(){new r({controller:u})})},{"../app":2,"../entities/favorites":7,"backbone.marionette":"backbone.marionette",jquery:"jquery",underscore:"underscore"}],4:[function(e){"use strict";var t=e("../app"),n=e("backbone.marionette"),o=e("jquery"),i=n.ItemView.extend({template:"#menu-template",triggers:{"click .search":"search:show","click .player":"player:show","click .favorites":"favorite:list"},events:{"click .nav a":"onClick"},onClick:function(e){this.$el.find(".active").removeClass("active"),o(e.target).parent().addClass("active"),this.$el.find(".collapse.in").collapse("toggle")},setActive:function(e){this.$el.find(".active").removeClass("active"),this.$el.find(e).parent().addClass("active")}}),a=new i,r={show:function(){a.on("search:show",function(){t.trigger("search:show")}),a.on("player:show",function(){t.trigger("player:show")}),a.on("favorite:list",function(){t.trigger("favorite:list")}),t.menu.show(a)},setActive:function(e){a.setActive(e)}};t.commands.setHandler("menu:show",function(){r.show()}),t.commands.setHandler("menu:set-active",function(e){r.setActive(e)})},{"../app":2,"backbone.marionette":"backbone.marionette",jquery:"jquery"}],5:[function(e){"use strict";var t=e("../app"),n=e("backbone.marionette"),o=e("underscore"),i=e("jquery"),a=e("../entities/favorites"),r=e("../entities/player"),s=e("rivets"),c=n.AppRouter.extend({appRoutes:{"player/:id":"show",player:"show"}}),l=n.ItemView.extend({template:o.template(i("#player-template").html()),ui:{playPause:".play-pause"},triggers:{"click .play-pause":"player:play-pause"},onShow:function(){this.binding=s.bind(this.$el,{model:this.model})},onDestroy:function(){this.binding.unbind()},loaded:function(){this.ui.playPause.button("reset")},loading:function(){this.ui.playPause.button("loading")}}),u={show:function(e){t.commands.execute("menu:set-active",".player"),a.list().then(function(n){var o=new l({model:r.viewModel()});o.on("player:play-pause",function(){"Pause"===o.model.get("action")?r.pause():r.play()}),t.content.show(o);var i;e?i=n.get(e):r.viewModel().has("id")||(i=n.at(0)),i&&r.play(i,function(){o.loading()},function(){o.loaded()})})}};t.on("player:show",function(e){t.navigate("player"+(e?"/"+e:"")),u.show(e)}),t.addInitializer(function(){new c({controller:u})})},{"../app":2,"../entities/favorites":7,"../entities/player":8,"backbone.marionette":"backbone.marionette",jquery:"jquery",rivets:"rivets",underscore:"underscore"}],6:[function(e){"use strict";var t=e("../app"),n=e("backbone.marionette"),o=e("backbone"),i=e("underscore"),a=e("jquery"),r=e("rivets"),s=e("../entities/favorites"),c=e("../entities/search"),l=n.AppRouter.extend({appRoutes:{search:"show"}}),u=o.Marionette.LayoutView.extend({className:"finder",template:"#finder-layout-view-template",regions:{filter:".finder-filter",list:".finder-content"}}),d=n.ItemView.extend({className:"sentences-filter",template:i.template(a("#filter-template").html()),ui:{findButton:".sentences_filter-find"},events:{"click .sentences_filter-find":"onFind","keyup .sentences_filter-criteria":"onEnter"},loaded:function(){this.ui.findButton.button("reset")},onFind:function(){this.ui.findButton.button("loading"),this.trigger("sentences:find")},onEnter:function(e){13===e.keyCode&&this.onFind()},onShow:function(){this.binding=r.bind(this.$el,{model:this.model})},onDestroy:function(){this.binding.unbind()}}),p=n.ItemView.extend({tagName:"tr",template:i.template(a("#sentence-template").html()),triggers:{"click .sentence-add":"sentence:add"}}),f=n.ItemView.extend({template:i.template(a("#sentences-empty-template").html())}),m=n.ItemView.extend({template:i.template(a("#sentences-error-template").html()),serializeData:function(){return this.model}}),h=n.CompositeView.extend({emptyView:f,childView:p,childViewContainer:"tbody",collectionEvents:{remove:"render"},template:i.template(a("#sentence-list-template").html())}),v={show:function(){t.commands.execute("menu:set-active",".search");var e=new u;t.content.show(e);var n=new d({model:c.dataModel()});n.on("sentences:find",function(){c.list({success:function(){n.loaded();var t=c.dataModel().get("sentences"),o=new h({collection:t});o.on("childview:sentence:add",function(e){s.add(e.model.attributes),t.remove(e.model)}),e.list.show(o)},error:function(t,o){n.loaded();var i=new m({model:{status:o.status,statusText:o.statusText}});e.list.show(i)}})}),e.filter.show(n)}};t.on("search:show",function(){t.navigate("search"),v.show()}),t.addInitializer(function(){new l({controller:v})})},{"../app":2,"../entities/favorites":7,"../entities/search":9,backbone:"backbone","backbone.marionette":"backbone.marionette",jquery:"jquery",rivets:"rivets",underscore:"underscore"}],7:[function(e,t){"use strict";var n=e("jquery"),o=e("backbone");o.$=n,o.LocalStorage=e("backbone.localstorage");var i=e("underscore"),a=o.Model.extend({save:function(e,t){t||(t={}),e||(e=i.clone(this.attributes)),delete e.howl,t.data=JSON.stringify(e),o.Model.prototype.save.call(this,e,t)}}),r=o.Collection.extend({model:a,localStorage:new o.LocalStorage("emachine")}),s=function(){var e=new r,t=n.Deferred();return e.fetch({success:t.resolve,error:t.reject}),function(){return t.promise()}}();t.exports={list:function(){return s()},add:function(e){s().then(function(t){t.create(e)})},del:function(e){s().then(function(t){t.get(e).destroy()})}}},{backbone:"backbone","backbone.localstorage":"backbone.localstorage",jquery:"jquery",underscore:"underscore"}],8:[function(e,t){"use strict";function n(){h.set({action:"Pause"}),c.howl.play()}function o(){h.set({action:"Play"}),c.timeoutId?(clearTimeout(c.timeoutId),delete c.timeoutId):c.howl.pause()}function i(){c.timeoutId?(clearTimeout(c.timeoutId),delete c.timeoutId):c.howl.stop()}function a(){var e=c.collection.indexOf(c),t=e+1<c.collection.length?e+1:0;return c.collection.at(t)}function r(){var e=1.25*c.howl._duration*1e3,t=setTimeout(function(){delete c.timeoutId,p>=2?(c=a(),l=a(),h.set(c.attributes),p=0):p++,n()},e>f?e:f);c.timeoutId=t}function s(e,t){e.howl=new u({urls:["audio/"+e.id+".mp3"],onend:r,onload:function(){t&&t()},onloaderror:function(e){h.set({error:!0,type:e.type})},onplay:function(){l.howl||s(l)}})}var c,l,u=e("howler").Howl,d=e("backbone"),p=0,f=3e3,m=d.Model.extend({defaults:{action:"Pause",sentence_eng:"",sentence_rus:""}}),h=new m;t.exports={remove:function(){},play:function(e,t,o){e?(h.has("id")&&h.get("id")!==e.id&&i(),c=e,l=a(),h.set(c.attributes),c.howl?n():(t&&t(),s(e,function(){o&&o(),n()}))):n()},pause:function(){o()},viewModel:function(){return h}}},{backbone:"backbone",howler:"howler"}],9:[function(e,t){"use strict";var n=e("jquery"),o=e("backbone");o.$=n;var i=o.Model.extend({defaults:{searchCriteria:""}}),a=o.Model.extend({}),r=o.Collection.extend({model:a,url:"/sentences"}),s=new r,c=new i({sentences:s});t.exports={list:function(e){c.get("searchCriteria")&&(e.data={like:c.get("searchCriteria")}),s.fetch(e)},dataModel:function(){return c}}},{backbone:"backbone",jquery:"jquery"}]},{},[1]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+//FIXME
+window.$ = window.jQuery = require('jquery');
+require('bootstrap');
+var rivets = require('rivets');
+
+// it needs just to initialize ios audio system
+var Howl = require('howler').Howl;
+new Howl({});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  var Backbone = require('backbone');
+
+  var App = require('./app');
+
+  require('./apps/search');
+  require('./apps/favorites');
+  require('./apps/player');
+  require('./apps/menu');
+
+  rivets.adapters[':'] = {
+    observe: function(model, key, callback) {
+      model.on('change:' + key, callback);
+    },
+    unobserve: function(model, key, callback) {
+      model.off('change:' + key, callback);
+    },
+    get: function(model, key) {
+      return model.get(key);
+    },
+    set: function(model, key, value) {
+      model.set(key, value);
+    }
+  };
+
+  App.start();
+  Backbone.history.start();
+
+});
+},{"./app":2,"./apps/favorites":3,"./apps/menu":4,"./apps/player":5,"./apps/search":6,"backbone":"backbone","bootstrap":"bootstrap","howler":"howler","jquery":"jquery","rivets":"rivets"}],2:[function(require,module,exports){
+'use strict';
+
+var jQuery, $;
+$ = jQuery = require('jquery');
+
+var Backbone = require('backbone');
+Backbone.$ = jQuery;
+var Marionette = require('backbone.marionette');
+
+
+// var _ = require('underscore');
+
+var App = new Marionette.Application({
+  regions: {
+    menu: '#menu',
+    content: '#content'
+  }
+});
+
+App.navigate = function(route, options) {
+  options || (options = {});
+  Backbone.history.navigate(route, options);
+};
+
+App.commands.execute('menu:show');
+
+module.exports = App;
+},{"backbone":"backbone","backbone.marionette":"backbone.marionette","jquery":"jquery"}],3:[function(require,module,exports){
+'use strict';
+var App = require('../app');
+
+var Marionette = require('backbone.marionette');
+var _ = require('underscore');
+var $ = require('jquery');
+var favorites = require('../entities/favorites');
+var SwipeOut = require('swipeout');
+
+var Router = Marionette.AppRouter.extend({
+  appRoutes: {
+    '': 'list',
+    'favorites': 'list'
+  }
+});
+
+var FavoriteLayoutView = Marionette.LayoutView.extend({
+  template: '#favorite-layout-view-template',
+
+  regions: {
+    list: '.favorite-list',
+    table: '.favorite-table'
+  }
+});
+
+var FavoriteTrView = Marionette.ItemView.extend({
+  tagName: 'tr',
+  template: _.template($('#favorite-tr-template').html()),
+  triggers: {
+    'click .del': 'favorite:del',
+    'click .play': 'favorite:play'
+  }
+});
+
+var FavoriteTableView = Marionette.CollectionView.extend({
+  tagName: 'tbody',
+  childView: FavoriteTrView
+});
+
+var FavoriteLiView = Marionette.ItemView.extend({
+  tagName: 'li',
+  className: 'fixed-height clipping-text',
+  template: _.template('<%= sentence_eng %>'),
+  triggers: {
+    'delete': 'favorite:del',
+    'click': 'favorite:play'
+  }
+});
+
+var FavoriteListView = Marionette.CollectionView.extend({
+  tagName: 'ul',
+  className: 'list-unstyled list-bordered nav-stick',
+  childView: FavoriteLiView,
+  onShow: function() {
+    new SwipeOut(this.el);
+  }
+});
+
+
+
+var FavoritesEmptyView = Marionette.ItemView.extend({
+  template: _.template($('#favorites-empty-template').html()),
+  triggers: {
+    'click .add': 'search:show'
+  }
+});
+
+
+var API = {
+  list: function() {
+    App.commands.execute('menu:set-active', '.favorites');
+    favorites.list().then(function(collection) {
+      if (collection.length > 0) {
+
+        var layoutView = new FavoriteLayoutView();
+        App.content.show(layoutView);
+
+        var favoriteTableView = new FavoriteTableView({
+          collection: collection
+        });
+        layoutView.table.show(favoriteTableView);
+
+        favoriteTableView.on('childview:favorite:del', function(childView) {
+          favorites.del(childView.model.id);
+        });
+        favoriteTableView.on('childview:favorite:play', function(childView) {
+          App.trigger('player:show', childView.model.id);
+        });
+
+
+        var favoriteListView = new FavoriteListView({
+          collection: collection
+        });
+        layoutView.list.show(favoriteListView);
+
+        favoriteListView.on('childview:favorite:del', function(childView) {
+          favorites.del(childView.model.id);
+        });
+        favoriteListView.on('childview:favorite:play', function(childView) {
+          App.trigger('player:show', childView.model.id);
+        });
+
+      } else {
+        var favoritesView = new FavoritesEmptyView();
+        favoritesView.on('search:show', function() {
+          App.trigger('search:show');
+        });
+        App.content.show(favoritesView);
+      }
+    });
+  }
+};
+
+App.on('favorite:list', function() {
+  App.navigate('favorites');
+  API.list();
+});
+
+App.addInitializer(function() {
+  new Router({
+    controller: API
+  });
+});
+},{"../app":2,"../entities/favorites":7,"backbone.marionette":"backbone.marionette","jquery":"jquery","swipeout":"swipeout","underscore":"underscore"}],4:[function(require,module,exports){
+'use strict';
+var App = require('../app');
+var Marionette = require('backbone.marionette');
+var $ = require('jquery');
+
+
+var MenuView = Marionette.ItemView.extend({
+  template: '#menu-template',
+  triggers: {
+    'click .search': 'search:show',
+    'click .player': 'player:show',
+    'click .favorites': 'favorite:list',
+  },
+  events: {
+    'click .nav a': 'onClick'
+  },
+  onClick: function(e) {
+    this.$el.find('.active').removeClass('active');
+    $(e.target).parent().addClass('active');
+    this.$el.find('.collapse.in').collapse('toggle');
+  },
+  setActive: function(selector) {
+    this.$el.find('.active').removeClass('active');
+    this.$el.find(selector).parent().addClass('active');
+  }
+});
+
+var menuView = new MenuView();
+
+var API = {
+  show: function() {
+    menuView.on('search:show', function() {
+      App.trigger('search:show');
+    });
+    menuView.on('player:show', function() {
+      App.trigger('player:show');
+    });
+    menuView.on('favorite:list', function() {
+      App.trigger('favorite:list');
+    });
+
+    App.menu.show(menuView);
+  },
+  setActive: function(selector) {
+    menuView.setActive(selector);
+  }
+};
+
+App.commands.setHandler('menu:show', function() {
+  API.show();
+});
+
+App.commands.setHandler('menu:set-active', function(selector) {
+  API.setActive(selector);
+});
+
+},{"../app":2,"backbone.marionette":"backbone.marionette","jquery":"jquery"}],5:[function(require,module,exports){
+'use strict';
+var App = require('../app');
+
+var Marionette = require('backbone.marionette');
+var _ = require('underscore');
+var $ = require('jquery');
+var favorites = require('../entities/favorites');
+var player = require('../entities/player');
+var rivets = require('rivets');
+
+//TODO
+/*
+подтверждение добавления и удаления
+поиск: иногда не отображается результат после возвращения
+свайп удаление
+badges
+*/
+
+
+var Router = Marionette.AppRouter.extend({
+  appRoutes: {
+    'player/:id': 'show',
+    'player': 'show'
+  }
+});
+
+
+var PlayerView = Marionette.ItemView.extend({
+  template: _.template($('#player-template').html()),
+  ui: {
+    'playPause': '.play-pause'
+  },
+  triggers: {
+    'click .play-pause': 'player:play-pause'
+  },
+  onShow: function() {
+    this.binding = rivets.bind(this.$el, {
+      model: this.model
+    });
+  },
+  onDestroy: function() {
+    this.binding.unbind();
+  },
+  loaded: function() {
+    this.ui.playPause.button('reset');
+  },
+  loading: function() {
+    this.ui.playPause.button('loading');
+  }
+});
+
+
+var API = {
+  show: function(id) {
+    App.commands.execute('menu:set-active', '.player');
+    favorites.list().then(function(collection, response, options) {
+
+      var playerView = new PlayerView({
+        model: player.viewModel()
+      });
+
+      playerView.on('player:play-pause', function() {
+        if (playerView.model.get('action') === 'Pause') {
+          player.pause();
+        } else {
+          player.play();
+        }
+      });
+      App.content.show(playerView);
+
+      var audio;
+      if (id) {
+        audio = collection.get(id);
+      } else if (!player.viewModel().has('id')) {
+        audio = collection.at(0);
+      }
+      audio && player.play(audio, function() {
+        playerView.loading();
+      }, function() {
+        playerView.loaded();
+      });
+
+
+
+    });
+  }
+};
+
+App.on('player:show', function(id) {
+  App.navigate('player' + (id ? ('/' + id) : ''));
+  API.show(id);
+});
+
+App.addInitializer(function() {
+  new Router({
+    controller: API
+  });
+});
+},{"../app":2,"../entities/favorites":7,"../entities/player":8,"backbone.marionette":"backbone.marionette","jquery":"jquery","rivets":"rivets","underscore":"underscore"}],6:[function(require,module,exports){
+'use strict';
+var App = require('../app');
+
+var Marionette = require('backbone.marionette');
+var Backbone = require('backbone');
+var _ = require('underscore');
+var $ = require('jquery');
+var rivets = require('rivets');
+
+var favorites = require('../entities/favorites');
+var searchService = require('../entities/search');
+
+
+var SearchRouter = Marionette.AppRouter.extend({
+  appRoutes: {
+    'search': 'show'
+  }
+});
+
+var SearchLayoutView = Backbone.Marionette.LayoutView.extend({
+  className: 'finder',
+  template: '#finder-layout-view-template',
+
+  regions: {
+    filter: '.finder-filter',
+    list: '.finder-content'
+  }
+});
+
+var FilterView = Marionette.ItemView.extend({
+  className: 'sentences-filter',
+  template: _.template($('#filter-template').html()),
+  ui: {
+    'findButton': '.sentences_filter-find'
+  },
+  events: {
+    'click .sentences_filter-find': 'onFind',
+    'keyup .sentences_filter-criteria': 'onEnter'
+  },
+  loaded: function() {
+    this.ui.findButton.button('reset');
+  },
+  onFind: function() {
+    this.ui.findButton.button('loading');
+    this.trigger('sentences:find');
+  },
+  onEnter: function(event) {
+    if (event.keyCode === 13) {
+      this.onFind();
+    }
+  },
+  onShow: function() {
+    this.binding = rivets.bind(this.$el, {
+      model: this.model
+    });
+  },
+  onDestroy: function() {
+    this.binding.unbind();
+  }
+});
+
+var SentenceView = Marionette.ItemView.extend({
+  tagName: 'tr',
+  template: _.template($('#sentence-template').html()),
+  triggers: {
+    'click .sentence-add': 'sentence:add'
+  }
+});
+
+var SentencesEmptyView = Marionette.ItemView.extend({
+  template: _.template($('#sentences-empty-template').html())
+});
+
+var ErrorView = Marionette.ItemView.extend({
+  template: _.template($('#sentences-error-template').html()),
+  serializeData: function() {
+    return this.model;
+  }
+});
+
+
+var SentenceListView = Marionette.CompositeView.extend({
+  emptyView: SentencesEmptyView,
+  childView: SentenceView,
+  childViewContainer: 'tbody',
+  collectionEvents: {
+    'remove': 'render'
+  },
+  template: _.template($('#sentence-list-template').html())
+});
+
+
+var API = {
+  show: function() {
+
+    App.commands.execute('menu:set-active', '.search');
+    var searchLayoutView = new SearchLayoutView();
+    App.content.show(searchLayoutView);
+
+
+    // search filter
+    var filterView = new FilterView({
+      model: searchService.dataModel()
+    });
+    filterView.on('sentences:find', function() {
+      searchService.list({
+        success: function() {
+          filterView.loaded();
+          // search result
+          // if (!sentenceListView) {
+            var sentences = searchService.dataModel().get('sentences');
+            var resultView = new SentenceListView({
+              collection: sentences
+            });
+            resultView.on('childview:sentence:add', function(childView) {
+              favorites.add(childView.model.attributes);
+              sentences.remove(childView.model);
+            });
+            searchLayoutView.list.show(resultView);
+          // }
+        },
+        error: function(collection, response, options) {
+          filterView.loaded();
+            var resultView = new ErrorView({
+              model: {
+                status: response.status,
+                statusText: response.statusText,
+              }
+            });
+            searchLayoutView.list.show(resultView);
+        }
+      });
+
+    });
+    searchLayoutView.filter.show(filterView);
+
+
+  }
+};
+
+App.on('search:show', function() {
+  App.navigate('search');
+  API.show();
+});
+
+App.addInitializer(function() {
+  new SearchRouter({
+    controller: API
+  });
+});
+},{"../app":2,"../entities/favorites":7,"../entities/search":9,"backbone":"backbone","backbone.marionette":"backbone.marionette","jquery":"jquery","rivets":"rivets","underscore":"underscore"}],7:[function(require,module,exports){
+'use strict';
+
+var $ = require('jquery');
+var Backbone = require('backbone');
+Backbone.$ = $;
+Backbone.LocalStorage = require('backbone.localstorage');
+var _ = require('underscore');
+
+var FavoriteModel = Backbone.Model.extend({
+  // Overwrite save function
+  save: function(attrs, options) {
+    options || (options = {});
+    attrs || (attrs = _.clone(this.attributes));
+
+    // Filter the data to send to the server
+    delete attrs.howl;
+
+    options.data = JSON.stringify(attrs);
+
+    // Proxy the call to the original save function
+    Backbone.Model.prototype.save.call(this, attrs, options);
+  }
+});
+
+var FavoriteCollection = Backbone.Collection.extend({
+  model: FavoriteModel,
+  localStorage: new Backbone.LocalStorage('emachine')
+});
+
+
+var getFavorites = (function() {
+  var favorites = new FavoriteCollection();
+  var deferred = $.Deferred();
+  favorites.fetch({
+    success: deferred.resolve,
+    error: deferred.reject
+  });
+  return function() {
+    return deferred.promise();
+  };
+})();
+
+module.exports = {
+  list: function() {
+    return getFavorites();
+  },
+  add: function(favorite) {
+    getFavorites().then(function(favorites) {
+      favorites.create(favorite);
+    });
+  },
+  del: function(id) {
+    getFavorites().then(function(favorites) {
+      favorites.get(id).destroy();
+    });
+  }
+};
+},{"backbone":"backbone","backbone.localstorage":"backbone.localstorage","jquery":"jquery","underscore":"underscore"}],8:[function(require,module,exports){
+'use strict';
+var Howl = require('howler').Howl;
+var Backbone = require('backbone');
+
+var repeat = 0,
+  minInterval = 3000,
+  _audio,
+  _next;
+
+
+var ViewModel = Backbone.Model.extend({
+  defaults: {
+    'action': 'Pause',
+    'sentence_eng': '',
+    'sentence_rus': ''
+  }
+});
+
+var _viewModel = new ViewModel();
+
+function play() {
+  _viewModel.set({
+    'action': 'Pause',
+  });
+
+  _audio.howl.play();
+}
+
+function pause() {
+  _viewModel.set({
+    'action': 'Play',
+  });
+
+  if (_audio.timeoutId) {
+    clearTimeout(_audio.timeoutId);
+    delete _audio.timeoutId;
+  } else {
+    _audio.howl.pause();
+  }
+
+}
+
+function _stop() {
+  if (_audio.timeoutId) {
+    clearTimeout(_audio.timeoutId);
+    delete _audio.timeoutId;
+  } else {
+    _audio.howl.stop();
+  }
+}
+
+function next() {
+  var index = _audio.collection.indexOf(_audio);
+  var nextIdx = index + 1 < _audio.collection.length ? index + 1 : 0;
+  return _audio.collection.at(nextIdx);
+}
+
+function onEnd() {
+  var interval = _audio.howl._duration * 1.25 * 1000;
+
+  var timeoutId = setTimeout(function() {
+    delete _audio.timeoutId;
+    if (repeat >= 2) {
+      _audio = next();
+      _next = next();
+      _viewModel.set(_audio.attributes);
+      repeat = 0;
+    } else {
+      repeat++;
+    }
+    play();
+  }, interval > minInterval ? interval : minInterval);
+
+  _audio.timeoutId = timeoutId;
+}
+
+function load(audio, onLoad) {
+
+  audio.howl = new Howl({
+    // urls: ['http://nodejs-emachine.rhcloud.com/' + 'audio/' + audio.id + '.mp3'],
+    urls: ['audio/' + audio.id + '.mp3'],
+    onend: onEnd,
+    onload: function() {
+      onLoad && onLoad();
+    },
+    onloaderror: function(error) {
+      _viewModel.set({
+        'error': true,
+        'type': error.type
+      });
+
+
+    },
+    onplay: function() {
+      // preload next audio
+      _next.howl || load(_next);
+    }
+  });
+}
+
+module.exports = {
+  //TODO
+  remove: function(audio) {
+
+  },
+  play: function(audio, onLoading, onLoaded) {
+    if (!audio) {
+      play();
+    } else {
+      if (_viewModel.has('id') && _viewModel.get('id') !== audio.id) {
+        _stop();
+      }
+      _audio = audio;
+      _next = next();
+      _viewModel.set(_audio.attributes);
+      if (!_audio.howl) {
+        onLoading && onLoading();
+        load(audio, function() {
+          onLoaded && onLoaded();
+          play();
+        });
+      } else {
+        play();
+      }
+    }
+  },
+  pause: function() {
+    pause();
+  },
+  viewModel: function() {
+    return _viewModel;
+  }
+};
+},{"backbone":"backbone","howler":"howler"}],9:[function(require,module,exports){
+'use strict';
+
+var $ = require('jquery');
+var Backbone = require('backbone');
+Backbone.$ = $;
+
+var SearchResult = Backbone.Model.extend({
+  defaults: {
+    'searchCriteria': ''
+  }
+});
+
+var SentenceModel = Backbone.Model.extend({});
+
+var SentenceCollection = Backbone.Collection.extend({
+  model: SentenceModel,
+  url: '/sentences'
+});
+
+var sentences = new SentenceCollection();
+
+var _searchResult = new SearchResult({
+  sentences: sentences
+});
+
+
+module.exports = {
+  list: function(options) {
+    _searchResult.get('searchCriteria') && (options.data = {
+      like: _searchResult.get('searchCriteria')
+    });
+    sentences.fetch(options);
+  },
+  dataModel: function() {
+    return _searchResult;
+  }
+
+};
+},{"backbone":"backbone","jquery":"jquery"}]},{},[1]);

@@ -1,5 +1,7 @@
 'use strict';
 
+var vendors = ['jquery', 'backbone', 'underscore', 'backbone.marionette', 'backbone.localstorage', 'howler', 'bootstrap', 'rivets', 'swipeout', 'hammerjs'];
+
 var gulp = require('gulp'),
   rename = require('gulp-rename'),
   uglify = require('gulp-uglify'),
@@ -9,7 +11,7 @@ var gulp = require('gulp'),
   browserify = require('browserify'),
   source = require('vinyl-source-stream'),
   buffer = require('vinyl-buffer'),
-  vendors = ['jquery', 'backbone', 'underscore', 'backbone.marionette', 'backbone.localstorage', 'howler', 'bootstrap', 'rivets'],
+  notify = require('gulp-notify'),
   gzip = require('gulp-gzip');
 
 
@@ -49,6 +51,7 @@ gulp.task('browserify:app', function() {
         .pipe(uglify())
         // Start piping stream to tasks!
         // .pipe(gzip())
+        .pipe(notify('main.js is bundled'))
         .pipe(gulp.dest('./public/javascripts/'));
 });
 

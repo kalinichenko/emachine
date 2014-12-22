@@ -1,0 +1,20 @@
+{
+  "name": "emachine",
+  "version": "0.0.0",
+  "homepage": "https://github.com/kalinichenko/emachine",
+  "authors": [
+    "Andrey Kalinichenko <kalinichenko@bifit.ua>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "hammer.js": "~2.0.4",
+    "swipeout": "ankane/swipeout"
+  }
+}
