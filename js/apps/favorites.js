@@ -3,7 +3,6 @@ var App = require('../app');
 
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
-var $ = require('jquery');
 var favorites = require('../entities/favorites');
 var SwipeOut = require('swipeout');
 
@@ -14,28 +13,21 @@ var Router = Marionette.AppRouter.extend({
   }
 });
 
-var FavoriteLayoutView = Marionette.LayoutView.extend({
-  template: '#favorite-layout-view-template',
-
-  regions: {
-    list: '.favorite-list',
-    table: '.favorite-table'
-  }
-});
-
 var FavoriteTrView = Marionette.ItemView.extend({
   tagName: 'tr',
-  template: _.template($('#favorite-tr-template').html()),
+  template: '#favorite-tr-template',
   triggers: {
     'click .del': 'favorite:del',
     'click .play': 'favorite:play'
   }
 });
 
-var FavoriteTableView = Marionette.CollectionView.extend({
-  tagName: 'tbody',
-  childView: FavoriteTrView
+var FavoriteTableView = Marionette.CompositeView.extend({
+  template: '#favorite-table-template',
+  childView: FavoriteTrView,
+  childViewContainer: 'tbody'
 });
+
 
 var FavoriteLiView = Marionette.ItemView.extend({
   tagName: 'li',
@@ -49,7 +41,7 @@ var FavoriteLiView = Marionette.ItemView.extend({
 
 var FavoriteListView = Marionette.CollectionView.extend({
   tagName: 'ul',
-  className: 'list-unstyled list-bordered nav-stick',
+  className: 'list-unstyled list-bordered nav-stick row',
   childView: FavoriteLiView,
   onShow: function() {
     new SwipeOut(this.el);
@@ -59,7 +51,7 @@ var FavoriteListView = Marionette.CollectionView.extend({
 
 
 var FavoritesEmptyView = Marionette.ItemView.extend({
-  template: _.template($('#favorites-empty-template').html()),
+  template: '#favorites-empty-template',
   triggers: {
     'click .add': 'search:show'
   }
@@ -72,40 +64,31 @@ var API = {
     favorites.list().then(function(collection) {
       if (collection.length > 0) {
 
-        var layoutView = new FavoriteLayoutView();
-        App.content.show(layoutView);
+        var favoritesView;
+        if(/iPhone/i.test(navigator.userAgent)) {
+          favoritesView = new FavoriteListView({
+            collection: collection
+          });
+        } else {
+          favoritesView = new FavoriteTableView({
+            collection: collection
+          });
+        }
 
-        var favoriteTableView = new FavoriteTableView({
-          collection: collection
-        });
-        layoutView.table.show(favoriteTableView);
-
-        favoriteTableView.on('childview:favorite:del', function(childView) {
+        favoritesView.on('childview:favorite:del', function(childView) {
           favorites.del(childView.model.id);
         });
-        favoriteTableView.on('childview:favorite:play', function(childView) {
+        favoritesView.on('childview:favorite:play', function(childView) {
           App.trigger('player:show', childView.model.id);
-        });
-
-
-        var favoriteListView = new FavoriteListView({
-          collection: collection
-        });
-        layoutView.list.show(favoriteListView);
-
-        favoriteListView.on('childview:favorite:del', function(childView) {
-          favorites.del(childView.model.id);
-        });
-        favoriteListView.on('childview:favorite:play', function(childView) {
-          App.trigger('player:show', childView.model.id);
-        });
-
-      } else {
-        var favoritesView = new FavoritesEmptyView();
-        favoritesView.on('search:show', function() {
-          App.trigger('search:show');
         });
         App.content.show(favoritesView);
+
+      } else {
+        var emptyView = new FavoritesEmptyView();
+        emptyView.on('search:show', function() {
+          App.trigger('search:show');
+        });
+        App.content.show(emptyView);
       }
     });
   }

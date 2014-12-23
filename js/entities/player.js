@@ -7,29 +7,41 @@ var repeat = 0,
   _audio,
   _next;
 
+var statuses = {
+  ERROR: 'statusError',
+  LOADING: 'statusLoading',
+  LOADED: 'statusLoaded',
+  PLAYING: 'statusPlaying',
+  PAUSED: 'statusPaused'
+};
 
 var ViewModel = Backbone.Model.extend({
   defaults: {
-    'action': 'Pause',
-    'sentence_eng': '',
-    'sentence_rus': ''
+    'action': 'Pause'
   }
 });
 
 var _viewModel = new ViewModel();
 
-function play() {
-  _viewModel.set({
-    'action': 'Pause',
-  });
+function _setStatus(status) {
+  _viewModel.set(status, true);
+  for (var key in _viewModel.attributes) {
+    if (key !== status && key.indexOf('status') === 0) {
+      _viewModel.set(key, false);
+    }
+  }
+}
+
+function _play() {
+  _viewModel.set('action', 'Pause');
+  _setStatus(statuses.PLAYING);
 
   _audio.howl.play();
 }
 
-function pause() {
-  _viewModel.set({
-    'action': 'Play',
-  });
+function _pause() {
+  _viewModel.set('action', 'Play');
+  _setStatus(statuses.PAUSED);
 
   if (_audio.timeoutId) {
     clearTimeout(_audio.timeoutId);
@@ -68,14 +80,13 @@ function onEnd() {
     } else {
       repeat++;
     }
-    play();
+    _play();
   }, interval > minInterval ? interval : minInterval);
 
   _audio.timeoutId = timeoutId;
 }
 
 function load(audio, onLoad) {
-
   audio.howl = new Howl({
     // urls: ['http://nodejs-emachine.rhcloud.com/' + 'audio/' + audio.id + '.mp3'],
     urls: ['audio/' + audio.id + '.mp3'],
@@ -84,12 +95,8 @@ function load(audio, onLoad) {
       onLoad && onLoad();
     },
     onloaderror: function(error) {
-      _viewModel.set({
-        'error': true,
-        'type': error.type
-      });
-
-
+      _setStatus(statuses.ERROR);
+      _viewModel.set('errorType', error ? error.type : 'unknown');
     },
     onplay: function() {
       // preload next audio
@@ -103,29 +110,33 @@ module.exports = {
   remove: function(audio) {
 
   },
-  play: function(audio, onLoading, onLoaded) {
+  play: function(audio) {
     if (!audio) {
-      play();
+      _play();
     } else {
-      if (_viewModel.has('id') && _viewModel.get('id') !== audio.id) {
+      if (_viewModel.has('data') && _viewModel.get('data').id !== audio.id) {
         _stop();
       }
-      _audio = audio;
-      _next = next();
-      _viewModel.set(_audio.attributes);
-      if (!_audio.howl) {
-        onLoading && onLoading();
-        load(audio, function() {
-          onLoaded && onLoaded();
-          play();
+      if (!_viewModel.has('data') || _viewModel.get('data').id !== audio.id) {
+        _audio = audio;
+        _next = next();
+        _viewModel.set({
+          data: _audio.attributes
         });
-      } else {
-        play();
+        if (!_audio.howl) {
+          _setStatus(statuses.LOADING);
+          load(audio, function() {
+            _setStatus(statuses.LOADED);
+            _play();
+          });
+        } else {
+          _play();
+        }
       }
     }
   },
   pause: function() {
-    pause();
+    _pause();
   },
   viewModel: function() {
     return _viewModel;

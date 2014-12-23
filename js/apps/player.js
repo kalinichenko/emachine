@@ -2,12 +2,16 @@
 var App = require('../app');
 
 var Marionette = require('backbone.marionette');
-var _ = require('underscore');
-var $ = require('jquery');
 var favorites = require('../entities/favorites');
 var player = require('../entities/player');
 var rivets = require('rivets');
 
+//TODO
+/*
+подтверждение добавления
+поиск: иногда не отображается результат после возвращения
+badges
+*/
 
 var Router = Marionette.AppRouter.extend({
   appRoutes: {
@@ -16,14 +20,18 @@ var Router = Marionette.AppRouter.extend({
   }
 });
 
-
 var PlayerView = Marionette.ItemView.extend({
-  template: _.template($('#player-template').html()),
+  template: '#player-template',
   ui: {
     'playPause': '.play-pause'
   },
   triggers: {
-    'click .play-pause': 'player:play-pause'
+    'click .paused': 'player:play',
+    'click .playing': 'player:pause',
+  },
+  modelEvents: {
+    'change:statusLoaded': 'onLoaded',
+    'change:statusLoading': 'onLoading'
   },
   onShow: function() {
     this.binding = rivets.bind(this.$el, {
@@ -33,11 +41,15 @@ var PlayerView = Marionette.ItemView.extend({
   onDestroy: function() {
     this.binding.unbind();
   },
-  loaded: function() {
-    this.ui.playPause.button('reset');
+  onLoaded: function() {
+    if (this.model.get('statusLoaded')) {
+      this.ui.playPause.button('reset');
+    }
   },
-  loading: function() {
-    this.ui.playPause.button('loading');
+  onLoading: function() {
+    if (this.model.get('statusLoading')) {
+      this.ui.playPause.button('loading');
+    }
   }
 });
 
@@ -51,29 +63,21 @@ var API = {
         model: player.viewModel()
       });
 
-      playerView.on('player:play-pause', function() {
-        if (playerView.model.get('action') === 'Pause') {
-          player.pause();
-        } else {
-          player.play();
-        }
+      playerView.on('player:play', function() {
+        player.play();
+      });
+      playerView.on('player:pause', function() {
+        player.pause();
       });
       App.content.show(playerView);
 
       var audio;
       if (id) {
         audio = collection.get(id);
-      } else if (!player.viewModel().has('id')) {
+      } else if (!player.viewModel().has('data')) {
         audio = collection.at(0);
       }
-      audio && player.play(audio, function() {
-        playerView.loading();
-      }, function() {
-        playerView.loaded();
-      });
-
-
-
+      audio && player.play(audio);
     });
   }
 };

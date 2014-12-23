@@ -12,11 +12,7 @@ tr:not(:hover) .glyphicon {
   bottom: 0;
   width: 100%;
 }
-/* Disable Auto Zoom in Input “Text” tag - Safari on iPhone */
 
-select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"] {
-  font-size: 16px;
-}
 .swipe-out .delete-btn {
   padding: 17px 25px;
   background: #ff3b30;

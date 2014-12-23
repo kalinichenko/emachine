@@ -3,8 +3,6 @@ var App = require('../app');
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var _ = require('underscore');
-var $ = require('jquery');
 var rivets = require('rivets');
 
 var favorites = require('../entities/favorites');
@@ -29,7 +27,7 @@ var SearchLayoutView = Backbone.Marionette.LayoutView.extend({
 
 var FilterView = Marionette.ItemView.extend({
   className: 'sentences-filter',
-  template: _.template($('#filter-template').html()),
+  template: '#filter-template',
   ui: {
     'findButton': '.sentences_filter-find'
   },
@@ -61,18 +59,18 @@ var FilterView = Marionette.ItemView.extend({
 
 var SentenceView = Marionette.ItemView.extend({
   tagName: 'tr',
-  template: _.template($('#sentence-template').html()),
+  template: '#sentence-template',
   triggers: {
     'click .sentence-add': 'sentence:add'
   }
 });
 
 var SentencesEmptyView = Marionette.ItemView.extend({
-  template: _.template($('#sentences-empty-template').html())
+  template: '#sentences-empty-template'
 });
 
 var ErrorView = Marionette.ItemView.extend({
-  template: _.template($('#sentences-error-template').html()),
+  template: '#sentences-error-template',
   serializeData: function() {
     return this.model;
   }
@@ -86,7 +84,7 @@ var SentenceListView = Marionette.CompositeView.extend({
   collectionEvents: {
     'remove': 'render'
   },
-  template: _.template($('#sentence-list-template').html())
+  template: '#sentence-list-template'
 });
 
 

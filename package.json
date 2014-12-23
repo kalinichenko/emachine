@@ -29,7 +29,7 @@
       ]
     }
   },
-  "dependencies": {
+  "devDependencies": {
     "backbone.babysitter": "^0.1.5",
     "backbone.localstorage": "^1.1.14",
     "backbone.wreqr": "^1.3.1",
@@ -39,8 +39,6 @@
     "cookie-parser": "~1.3.3",
     "debug": "~2.0.0",
     "express": "~4.9.0",
-    "express-device": "^0.3.11",
-    "hammerjs": "1.0.5",
     "howler": "^1.1.25",
     "jade": "~1.6.0",
     "jquery": "^2.1.1",
@@ -48,9 +46,7 @@
     "mysql": "^2.5.3",
     "rivets": "^0.7.1",
     "serve-favicon": "~2.1.3",
-    "underscore": "^1.7.0"
-  },
-  "devDependencies": {
+    "underscore": "^1.7.0",
     "gulp": "^3.8.10",
     "gulp-gzip": "0.0.8",
     "gulp-minify-css": "^0.3.11",

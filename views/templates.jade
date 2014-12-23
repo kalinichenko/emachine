@@ -19,9 +19,9 @@ script(type='text/template' id='menu-template')
           a.player(href="#") Player
 
 
-script(type='text/template' id='favorite-layout-view-template')
-    div.favorite-list.visible-xs.row
-    table.table.table-hover.borderless.favorite-table.hidden-xs
+script(type='text/template' id='favorite-table-template')
+    table.table.table-hover.borderless.favorite-table
+      tbody
 
 script(type='text/template' id='favorite-tr-template')
     td.play.cursor-pointer
@@ -67,10 +67,11 @@ script(type='text/template' id='finder-layout-view-template')
     div.finder-filter
     div.finder-content
 
+// player
 script(type='text/template' id='player-template')
-  div.alert.alert-danger(role="alert" rv-if='model:error') Something wrong has happend. Type: {model:type}.
-  h1.text-center {model:sentence_eng}
+  div.alert.alert-danger(role="alert" rv-if='model:error') Something wrong has happend. Type: {model:errorType}.
+  h1.text-center { model:data.sentence_eng }
   h4.text-center
-    small { model:sentence_rus }
-  button.play-pause.btn.btn-default.form-control(data-loading-text="Loading" rv-html='model:action')
+    small { model:data.sentence_rus }
+  button.play-pause.btn.btn-default.form-control(data-loading-text="Loading" rv-html='model:action' rv-class-playing='model:statusPlaying' rv-class-paused='model:statusPaused')
 

@@ -5,14 +5,12 @@ var vendors = ['jquery', 'backbone', 'underscore', 'backbone.marionette', 'backb
 var gulp = require('gulp'),
   rename = require('gulp-rename'),
   uglify = require('gulp-uglify'),
-  watch = require('gulp-watch'),
-  runSequence = require('run-sequence'),
   minifyCSS = require('gulp-minify-css'),
   browserify = require('browserify'),
   source = require('vinyl-source-stream'),
   buffer = require('vinyl-buffer'),
-  notify = require('gulp-notify'),
-  gzip = require('gulp-gzip');
+  notify = require('gulp-notify');
+
 
 
 gulp.task('uglify', function() {
@@ -49,8 +47,6 @@ gulp.task('browserify:app', function() {
         .pipe(source('main.js'))
         .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
         .pipe(uglify())
-        // Start piping stream to tasks!
-        // .pipe(gzip())
         .pipe(notify('main.js is bundled'))
         .pipe(gulp.dest('./public/javascripts/'));
 });
@@ -60,11 +56,9 @@ gulp.task('watch:css', function () {
 });
 
 gulp.task('watch', function () {
-  // gulp.watch('./js/*.js', ['uglify']);
   gulp.watch('./js/**/*.js', ['browserify:app']);
 });
 
-// gulp.task('watch', ['watch:css', 'watch:js']);
 
 gulp.task('default', ['watch']);
 
