@@ -8,7 +8,6 @@ var rivets = require('rivets');
 
 //TODO
 /*
-подтверждение добавления
 поиск: иногда не отображается результат после возвращения
 badges
 */
@@ -31,9 +30,11 @@ var PlayerView = Marionette.ItemView.extend({
   },
   modelEvents: {
     'change:statusLoaded': 'onLoaded',
-    'change:statusLoading': 'onLoading'
+    'change:statusLoading': 'onLoading',
+    'change:statusPlaying': 'onPlaying',
+    'change:statusPaused': 'onPaused'
   },
-  onShow: function() {
+  onRender: function() {
     this.binding = rivets.bind(this.$el, {
       model: this.model
     });
@@ -41,15 +42,17 @@ var PlayerView = Marionette.ItemView.extend({
   onDestroy: function() {
     this.binding.unbind();
   },
+  onPlaying: function() {
+    this.model.get('statusPlaying') && this.model.set('action', 'Pause');
+  },
+  onPaused: function() {
+    this.model.get('statusPaused') &&  this.model.set('action', 'Play');
+  },
   onLoaded: function() {
-    if (this.model.get('statusLoaded')) {
-      this.ui.playPause.button('reset');
-    }
+    this.model.get('statusLoaded') && this.ui.playPause.button('reset');
   },
   onLoading: function() {
-    if (this.model.get('statusLoading')) {
-      this.ui.playPause.button('loading');
-    }
+    this.model.get('statusLoading') && this.ui.playPause.button('loading');
   }
 });
 

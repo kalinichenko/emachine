@@ -33,16 +33,12 @@ function _setStatus(status) {
 }
 
 function _play() {
-  _viewModel.set('action', 'Pause');
   _setStatus(statuses.PLAYING);
-
   _audio.howl.play();
 }
 
 function _pause() {
-  _viewModel.set('action', 'Play');
   _setStatus(statuses.PAUSED);
-
   if (_audio.timeoutId) {
     clearTimeout(_audio.timeoutId);
     delete _audio.timeoutId;
@@ -75,12 +71,12 @@ function onEnd() {
     if (repeat >= 2) {
       _audio = next();
       _next = next();
-      _viewModel.set(_audio.attributes);
+      _viewModel.set('data', _audio.attributes);
       repeat = 0;
     } else {
       repeat++;
     }
-    _play();
+    _audio.howl.play();
   }, interval > minInterval ? interval : minInterval);
 
   _audio.timeoutId = timeoutId;

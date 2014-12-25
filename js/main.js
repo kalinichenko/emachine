@@ -8,6 +8,21 @@ var rivets = require('rivets');
 var Howl = require('howler').Howl;
 new Howl({});
 
+rivets.adapters[':'] = {
+  observe: function(model, key, callback) {
+    model.on('change:' + key, callback);
+  },
+  unobserve: function(model, key, callback) {
+    model.off('change:' + key, callback);
+  },
+  get: function(model, key) {
+    return model.get(key);
+  },
+  set: function(model, key, value) {
+    model.set(key, value);
+  }
+};
+
 
 document.addEventListener('DOMContentLoaded', function() {
   var Backbone = require('backbone');
@@ -18,21 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
   require('./apps/favorites');
   require('./apps/player');
   require('./apps/menu');
-
-  rivets.adapters[':'] = {
-    observe: function(model, key, callback) {
-      model.on('change:' + key, callback);
-    },
-    unobserve: function(model, key, callback) {
-      model.off('change:' + key, callback);
-    },
-    get: function(model, key) {
-      return model.get(key);
-    },
-    set: function(model, key, value) {
-      model.set(key, value);
-    }
-  };
 
   App.start();
   Backbone.history.start();

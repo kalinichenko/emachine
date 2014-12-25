@@ -1,22 +1,22 @@
 script(type='text/template' id='menu-template')
-  nav.navbar.navbar-default(role="navigation")
-    div.navbar-header
-      button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1")
-        span.sr-only Toggle navigation
-        span.icon-bar
-        span.icon-bar
-        span.icon-bar
-      a.navbar-brand(href="#") E-machine
-    div.collapse.navbar-collapse#bs-example-navbar-collapse-1
-      ul.nav.navbar-nav
-        li
-          a.favorites(href="#") Favorites
-      ul.nav.navbar-nav
-        li
-          a.search(href="#") Search
-      ul.nav.navbar-nav
-        li
-          a.player(href="#") Player
+  div.navbar-header
+    button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1")
+      span.sr-only Toggle navigation
+      span.icon-bar
+      span.icon-bar
+      span.icon-bar
+    a.navbar-brand(href="#") E-machine
+  div.collapse.navbar-collapse#bs-example-navbar-collapse-1
+    ul.nav.navbar-nav.nav-badges
+      li
+        a.favorites(href="#") Favorites
+          span.badge {model:favoriteCnt}
+    ul.nav.navbar-nav
+      li
+        a.search(href="#") Search
+    ul.nav.navbar-nav
+      li
+        a.player(href="#") Player
 
 
 script(type='text/template' id='favorite-table-template')
@@ -49,8 +49,7 @@ script(type='text/template' id='sentence-list-template')
         tbody
 
 script(type='text/template' id='sentences-empty-template')
-    p(style='white-space:pre;')
-        | Nothing found for specified criteria.
+    div.alert.alert-warning Nothing's been found for specified criteria.
 
 script(type='text/template' id='sentences-error-template')
     div.alert.alert-danger(role="alert") Something wrong has happend. Status: <%= status %>. Text: <%= statusText %>.

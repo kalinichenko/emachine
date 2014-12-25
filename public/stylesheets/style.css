@@ -21,6 +21,14 @@ tr:not(:hover) .glyphicon {
   right: 0 !important;
 }
 
+.finder .swipe-out .delete-btn {
+  background: #4cd964;
+}
+
+.finder .list-bordered:first-child {
+  border-top: 1px solid #ddd !important;
+}
+
 .list-bordered li {
   border-bottom: 1px solid #ddd !important;
 }
@@ -39,4 +47,8 @@ tr:not(:hover) .glyphicon {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.nav-badges>li>a>.badge {
+  margin-left: 3px;
 }

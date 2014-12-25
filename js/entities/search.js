@@ -19,9 +19,7 @@ var SentenceCollection = Backbone.Collection.extend({
 
 var sentences = new SentenceCollection();
 
-var _searchResult = new SearchResult({
-  sentences: sentences
-});
+var _searchResult = new SearchResult();
 
 
 module.exports = {
