@@ -51,7 +51,7 @@ module.exports = {
   },
   del: function(id) {
     getFavorites().then(function(favorites) {
-      favorites.remove(favorites.get(id));
+      favorites.get(id).destroy();
     });
   }
 };

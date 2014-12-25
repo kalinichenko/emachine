@@ -29,14 +29,14 @@ script(type='text/template' id='favorite-tr-template')
         i.glyphicon.glyphicon-play
     td.favorite.play.cursor-pointer <%= sentence_eng %>
     td
-      a.del(href='')
+      a.del.pull-right(href='')
         i.glyphicon.glyphicon-remove
 
 script(type='text/template' id='favorites-empty-template')
-    h3(style='white-space:pre;')
-        | Your learning list is empty.
-        | Wanna to add something interesting?
-    button.add.btn.btn-primary(type='button') Add
+  div.jumbotron
+    h3 Your learning list is empty.
+    p Wanna find something interesting?
+    button.add.btn.btn-primary(type='button') Yeap!
 
 
 script(type='text/template' id='sentence-template')

@@ -9,13 +9,66 @@ html
     title= title
     script(src='/javascripts/vendor.js')
     script(src='/javascripts/main.js')
-
-
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css")
-    link(rel="stylesheet" href="stylesheets/style.css")
+
+    style.
+      borderless tbody tr td, .borderless thead tr th {
+        border: none;
+      }
+
+      tr:not(:hover) .glyphicon {
+        color: lightgrey;
+      }
+      .cursor-pointer {
+        cursor: pointer;
+      }
+      .bottom-of-page {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+
+      .swipe-out .delete-btn {
+        padding: 17px 25px;
+        background: #ff3b30;
+        color: #fff;
+        font: bold 14px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+        right: 0 !important;
+      }
+
+      .finder .swipe-out .delete-btn {
+        background: #4cd964;
+      }
+
+      .finder .list-bordered:first-child {
+        border-top: 1px solid #ddd !important;
+      }
+
+      .list-bordered li {
+        border-bottom: 1px solid #ddd !important;
+      }
+
+      .nav-stick {
+        margin-top: -20px;
+      }
+
+      .fixed-height {
+        line-height: 50px;
+        vertical-align: middle;
+        padding: 0 15px;
+      }
+
+      .clipping-text {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .nav-badges>li>a>.badge {
+        margin-left: 3px;
+      }
 
     include ./templates.jade
-
 
   body
     block content
