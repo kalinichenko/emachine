@@ -21,6 +21,9 @@ This page is used for authentication as well as POST using the Iframe+form+hash 
 
 	<h2>Please close this window to continue.</h2>
 	<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		require('hellojs')
+	});
 		// DEBUG
 		if(window.navigator.userAgent.match(/iPad|iPhone/)&&window.navigator.userAgent.match('Version/8.0')){
 			p("Wait one pesky minute: Your on iOS8 aren't you? [eye-roll] it can't automatically close tabs.");
@@ -40,6 +43,6 @@ This page is used for authentication as well as POST using the Iframe+form+hash 
 			document.body.appendChild(a);
 		}
 	</script>
-	<script src="./javascript/hello.js"></script>
+	<script src="./javascripts/vendor.js"></script>
 </body>
 </html>
