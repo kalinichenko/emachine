@@ -4,10 +4,29 @@ var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
 var $ = require('jquery');
 var rivets = require('rivets');
+var hello = require('hellojs');
 
 var favorites = require('../entities/favorites');
 
+var GOOGLE_CLIENT_ID = '1060900813305-cuinmlgsdtakomkfkb8mb1jeq9512i6a.apps.googleusercontent.com';
 var menuView;
+
+hello.init({
+  google: GOOGLE_CLIENT_ID
+}, {
+  display: 'popup',
+  redirect_uri: 'redirect.html',
+  scope: 'profile',
+  response_type: 'token'
+});
+
+hello.on('auth.login', function(auth){
+  // call user information, for the given network
+  hello( auth.network ).api( '/me' ).then( function(r){
+    // labelEl.innerHTML = '<img src="'+ r.thumbnail +'" /> Hey ' + r.name
+    console.log(r.name);
+  });
+});
 
 var MenuView = Marionette.ItemView.extend({
   template: '#menu-template',
@@ -31,6 +50,8 @@ var MenuView = Marionette.ItemView.extend({
     }
   },
   events: {
+    'click .signin': 'signin',
+    'click .logout': 'logout',
     'click .collapse.in': 'collapseMenu'
   },
   onShow: function() {
@@ -43,6 +64,23 @@ var MenuView = Marionette.ItemView.extend({
   },
   collapseMenu: function(e) {
     $(e.currentTarget).collapse('toggle');
+  },
+  logout: function() {
+    hello('google').logout().then(function() {
+      alert("Signed out");
+    }, function(e) {
+      alert("Signed out error:" + e.error.message);
+    });
+  },
+  signin: function() {
+    var token;
+    hello('google').login(function() {
+      token = hello('google').getAuthResponse().access_token;
+    }).then(function() {
+      alert("You are signed in to Google");
+    }, function(e) {
+      alert("Signin error: " + e.error.message);
+    });
   },
   setActive: function(selector) {
     this.$el.find('.active').removeClass('active');
@@ -62,6 +100,7 @@ var API = {
 
 favorites.list().then(function(collection) {
   var menuModel = new Backbone.Model();
+
   function setFavoriteCnt() {
     menuModel.set('favoriteCnt', collection.length);
   }
@@ -89,4 +128,3 @@ favorites.list().then(function(collection) {
   });
 
 });
-
